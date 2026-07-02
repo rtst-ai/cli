@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+# Bootstrap the rtst CLI + skills for the current agent.
+# Usage: ./skills/setup   (or run via: npx skills add rtst-ai/cli)
+set -euo pipefail
+
+echo "==> Installing the rtst CLI (if missing)…"
+if ! command -v rtst >/dev/null 2>&1; then
+  npm install -g @rtst-ai/cli
+else
+  echo "    rtst already installed: $(command -v rtst)"
+fi
+
+echo "==> Checking authentication…"
+if rtst auth whoami --json >/dev/null 2>&1; then
+  echo "    Authenticated."
+else
+  echo "    Not authenticated. Run:  rtst auth login"
+fi
+
+echo "==> Checking ffmpeg (needed by rtst-video-stitch)…"
+if command -v ffmpeg >/dev/null 2>&1; then
+  echo "    ffmpeg present."
+else
+  echo "    ffmpeg missing. Install it: brew install ffmpeg  (or apt-get install ffmpeg)"
+fi
+
+echo "==> Done. Install the skills into your agent with:"
+echo "      npx skills add rtst-ai/cli"
