@@ -75,7 +75,9 @@ multi-tenant/privilege boundary inside the CLI; the primary assets to protect ar
 
 Every API request carries identifying headers so the backend can attribute CLI
 traffic (matching the app's `deviceFingerprint` convention): `User-Agent`,
-`X-Platform` (OS), `X-Tool: cli`, `X-App-Version`, and `X-Device-Fingerprint`.
+`X-Platform` (OS), `X-Tool: cli`, `X-App-Version` (the app API surface the CLI
+targets — the backend semver-gates model catalogs on it), `X-CLI-Version` (the
+CLI's own version), and `X-Device-Fingerprint`.
 
 - **`X-Device-Fingerprint`** is a one-way SHA-256 of stable machine attributes
   (hostname, OS, arch, username, first MAC) — pseudonymous, never the raw values,

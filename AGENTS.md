@@ -30,12 +30,15 @@ npm install -g @rtst-ai/cli
 
 ```bash
 rtst config set base-url https://api.rtst.ai      # or: rtst config set base-url local
-rtst auth login --email you@example.com --password ****   # stores a ~30-day JWT
-rtst auth whoami --json                                    # verify
+rtst auth login              # opens a BROWSER sign-in (Google/Facebook/OTP) — needs a human
+rtst auth whoami --json      # verify
 ```
 
-Tokens live ~30 days; re-run `auth login` when they expire. For **headless /
-CI / agent** use, skip the login and set environment variables:
+`auth login` requires a human to complete the browser flow, so an **agent must
+not run it itself** — ask the user to run it in their terminal. (`--no-web
+--email ... --password ...` is a terminal fallback; over SSH only that flow
+works.) Tokens live ~30 days; the user re-runs `auth login` when they expire.
+For **headless / CI / agent** use, skip the login and set environment variables:
 
 ```bash
 export RTST_API_URL=https://api.rtst.ai
@@ -149,10 +152,20 @@ ffmpeg -i clip.mp4 -vf "fps=12,scale=480:-1" preview.gif
 
 ## Error handling for agents
 
-- **Exit 2 + auth hint** → run `rtst auth login` or set `RTST_TOKEN`, then retry.
-- With `--json`, errors print `{"success":false,"error":"...","status":N,"hint":"..."}` to stdout.
+- With `--json`, errors print `{"success":false,"error":"...","status":N,"hint":"...","body":...}`
+  to stdout. **The `hint` field tells you the next command to run — follow it.**
+- **Exit 2 (auth)** → the token is missing or expired. Ask the user to run
+  `rtst auth login` (browser sign-in), or set a fresh `RTST_TOKEN`, then retry
+  the same command.
+- **HTTP 402 / credit errors** → check `rtst account credits --json`; the user
+  tops up at https://rtst.ai.
+- **HTTP 400/422** → invalid params: re-check `rtst model get <name> --json`.
+- **HTTP 404** → wrong model name or job id: `rtst model list --json`,
+  `rtst video list --json` / `rtst image list --json`.
+- **HTTP 429 / 5xx** → transient: back off and retry.
 - A **failed job** (status `error`/`blocked`) makes `wait` exit non-zero; read the
-  printed body for the provider's reason (often a content-policy rejection).
+  printed body for the provider's reason (often a content-policy rejection —
+  rephrase the prompt and resubmit).
 - **Timeouts:** raise `--timeout`; 1080p video jobs can take several minutes.
 
 ## Safety

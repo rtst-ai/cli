@@ -57,9 +57,10 @@ rtst --version
 Three steps from install to your first generation:
 
 ```bash
-# 1. Sign in. This stores a token (valid for about 30 days) in your
-#    OS keychain on macOS, or in ~/.config/rtst with 0600 permissions.
-rtst auth login --email you@example.com
+# 1. Sign in. This opens rtst.ai in your browser (Google, Facebook, and
+#    email OTP all work) and stores a token (valid for about 30 days) in
+#    your OS keychain on macOS, or in ~/.config/rtst with 0600 permissions.
+rtst auth login
 
 # 2. See which models are available and what parameters they accept.
 rtst model list --video
@@ -88,6 +89,14 @@ Tip: preview the credit cost of any generation before running it with `rtst vide
 | top level | `upload`, `api`, `update`, `guide` | File upload, raw API access, self-update, agent guide |
 
 Run `rtst <command> --help` for details on any command, or `rtst guide` for the full automation guide, including ffmpeg recipes.
+
+## Signing in
+
+`rtst auth login` opens the rtst.ai login page in your browser. Sign in with any supported method (Google, Facebook, or email OTP) and click Authorize; the CLI receives the token on a local callback and stores it. Variants:
+
+- `rtst auth login --no-browser` prints the login URL instead of auto-opening a browser.
+- `rtst auth login --no-web` uses the terminal email and password flow instead (also triggered by passing `--email` or `--password`). Over SSH, use this: the browser callback only works when the browser runs on the same machine as the CLI.
+- Headless, CI, and agent environments should skip login entirely and set `$RTST_TOKEN` (grab one on a trusted machine with `rtst auth token`).
 
 ## Global flags
 
