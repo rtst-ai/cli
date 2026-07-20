@@ -13,7 +13,8 @@ rtst video create seedance20mini --prompt "..." [flags] --wait --json
 - **Resolutions:** `480p`, `720p` (no 1080p / 4K)
 - **Durations (s):** `4`–`15` (any integer in range)
 - **Audio:** Yes — enable with `--audio`
-- **Image input:** `--first-frame <file>`, `--last-frame <file>` (frame interpolation), `--reference-image <file>` (repeatable). Local files auto-upload; URLs also accepted.
+- **Image input:** `--first-frame <file>`, `--last-frame <file>` (frame interpolation), `--reference-image <file>` (repeatable, up to 9). Inputs may be local files, URLs, or existing photo ids; this model takes **photo ids, not URLs**, so the CLI uploads each input as a Photo automatically.
+- **Prompt placeholders (required for references):** mention each reference in the prompt — `{{img1}}`, `{{img2}}`, ... for `--reference-image` order; `{{first}}`/`{{last}}` for the frame flags. Unmentioned references anchor nothing. Content-moderated (public figures rejected).
 
 ## How to prompt it
 Prompt it the same way as the rest of the 2.0 family. Use the BytePlus 6-step formula, ~60–100 words:

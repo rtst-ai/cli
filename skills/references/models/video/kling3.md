@@ -23,7 +23,13 @@ rtst video create <name> --prompt "..." [flags] --wait --json
 - **Durations (s):** `3`–`15`
 - **Audio:** yes — enable with `--audio`
 - **Image input:** `--first-frame <file>` and/or `--last-frame <file>` for
-  image-to-video / start-end interpolation. Local files auto-upload.
+  image-to-video / start-end interpolation, plus one `--reference-image` (max 1).
+  Inputs may be local files, URLs, or existing photo ids; this model takes
+  **photo ids, not URLs**, so the CLI uploads each input as a Photo automatically.
+- **Prompt placeholders:** refer to the reference in the prompt as `{{img1}}`
+  (`{{first}}`/`{{last}}` for the frame flags), e.g. `"the product from {{img1}}
+  rotating on a turntable"`. An unmentioned reference anchors nothing.
+  Content-moderated (public figures rejected).
 
 ## How to prompt it
 

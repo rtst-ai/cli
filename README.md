@@ -73,7 +73,7 @@ rtst video create seedance15pro \
 rtst video download <id> -o clip.mp4
 ```
 
-Tip: preview the credit cost of any generation before running it with `rtst video cost ...` or `rtst image cost ...`.
+Tip: preview the credit cost of any generation before running it with `rtst video cost ...` or `rtst image cost ...`, or add `--estimate` to a `create` command to price those exact flags without submitting anything.
 
 ## Commands
 
@@ -153,7 +153,7 @@ The CLI is designed to be driven by LLM agents. Read [AGENTS.md](./AGENTS.md) or
 
 1. Always pass `--json`, parse stdout, and check the exit code.
 2. The flow is `create`, then `wait`, then `download`. Statuses `active` and `success` mean done; `error` and `blocked` mean failed.
-3. Preview credit cost with the `cost` subcommands before spending credits.
+3. Preview credit cost with the `cost` subcommands, or `create ... --estimate`, before spending credits.
 4. Discover models and valid parameters with `rtst model list` and `rtst model get <name>`. Never assume parameter values.
 
 Ready-made agent skills live in [skills/](./skills/); install them with `npx skills add rtst-ai/cli`.

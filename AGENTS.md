@@ -15,9 +15,16 @@ are auto-uploaded.
 3. **Generation is async:** `create` returns a job **id**; then `wait` (or poll
    with `get`) until the status is terminal. Terminal **success** =
    `active`/`success`; **failure** = `error`/`blocked`.
-4. **Preview spend** with `... cost ...` before `create`. Credits are real money.
+4. **Preview spend** before `create`. Credits are real money. Either
+   `rtst video|image cost <model> ...`, or add `--estimate` to the exact
+   `create` command you are about to run: it prints the cost of those precise
+   flags and exits without submitting (no flag-translation mistakes).
 5. **Discover** models & their valid params at runtime with `rtst model list` and
    `rtst model get <name>` — never assume a model name or a parameter value.
+   In the video table, `i2v` means the model accepts an image input
+   (image-to-video via `--first-frame` etc.); `audio` means native audio
+   generation. In `--json`, the same facts are `is_image_supported` /
+   `is_audio_supported`.
 
 ## Install
 
@@ -55,6 +62,10 @@ Resolution precedence for base-url and token: **flag > env
 rtst model list --video --json
 rtst video cost seedance15pro --duration 8 --resolution 1080p --aspect-ratio 9:16 --json
 
+# or estimate with the EXACT create flags (nothing is submitted):
+rtst video create seedance15pro --prompt "..." --aspect-ratio 9:16 --duration 8 \
+  --resolution 1080p --estimate --json
+
 ID=$(rtst video create seedance15pro \
   --prompt "a neon city street at night, slow dolly forward, cinematic, rain" \
   --aspect-ratio 9:16 --duration 8 --resolution 1080p --json | jq -r '.id // .data.id')
@@ -68,10 +79,61 @@ One-shot blocking form: add `--wait` to `create`.
 **Image-to-video:** `--first-frame ./start.png` (also `--last-frame`,
 `--reference-image` repeatable). Local files auto-upload; URLs pass through.
 
+### Reference images & prompt placeholders (Seedance 2 / Kling 3 / Gemini Omni Flash)
+
+Structured-reference models (`seedance20`, `seedance20fast`, `seedance20mini`,
+`kling3`, `kling3omni`, `geminiomniflash`) treat reference images as **named
+actors you direct from the prompt**, not as passive style hints. Check support
+and limits at runtime: `rtst model get <name> --json` →
+`image_capabilities.reference_images` (`supported`, `max`) and
+`reference_input_type: "id"` marks a placeholder model.
+
+**How to use:** pass images with the normal flags, then refer to each one
+inside the prompt with a placeholder — `{{img1}}` is the first
+`--reference-image`, `{{img2}}` the second, ... and `{{first}}`/`{{last}}`
+refer to `--first-frame`/`--last-frame`:
+
+```bash
+rtst video create seedance20 \
+  --reference-image ./hero.png --reference-image ./city.png \
+  --prompt "The woman from {{img1}} walks through the neon street from {{img2}}, \
+camera tracking her from behind, rain, cinematic atmosphere, slow dolly" \
+  --aspect-ratio 16:9 --duration 8 --resolution 1080p --wait --json
+```
+
+- The CLI uploads each image as a Photo, and rewrites the placeholders to the
+  photo-id tags the API expects; the API then maps them to the provider's
+  `[Image N]` labels. Passing a bare number (e.g. `--reference-image 123`)
+  reuses an existing photo id directly, and raw `{{123}}` id tags in the
+  prompt pass through untouched.
+- **Prompt every reference you pass.** A reference image the prompt never
+  mentions gives the model nothing to anchor: say what each image contributes
+  (person, product, style, background).
+- Reference media are content-moderated: photos of public figures are
+  rejected, and human photos can take a moment of extra processing on first
+  use (retry shortly if told a photo is still processing).
+- On all **other** video models, `--reference-image` is unsupported (see
+  `image_capabilities`) and image inputs are plain URLs — placeholders have no
+  meaning there.
+
+**Video editing (`geminiomniflash`):** pass source footage with
+`--reference-video <file|url|id>` and address it in the prompt as `{{vid1}}` —
+it can remove objects/people, swap backgrounds, change the color grade,
+restyle footage, and add captions while keeping the rest intact:
+
+```bash
+rtst video create geminiomniflash --reference-video ./clip.mp4 \
+  --prompt "In {{vid1}}, remove the person in the background. Keep everything else the same." \
+  --aspect-ratio 16:9 --duration 8 --wait --json
+```
+
+Keep edit instructions short and surgical (one change + "Keep everything else
+the same"); see `skills/references/models/video/geminiomniflash.md`.
+
 ## Image lifecycle
 
 ```bash
-rtst image cost seedream45 --samples 2 --json
+rtst image cost seedream45 --samples 2 --json    # or: rtst image create ... --estimate --json
 rtst image create seedream45 --prompt "studio product shot of a watch on marble, soft light" --samples 2 --wait --json
 rtst image download <id> -o out.png
 ```
@@ -105,6 +167,15 @@ rtst edit watermark-remove ./clip.mp4 --wait --json
 rtst edit motion-transfer --model kling --character ./person.png \
   --reference-video https://example.com/dance.mp4 --orientation image --wait --json
 ```
+
+Edit tools charge a **fixed per-use price** that cannot be previewed yet (the
+API has no estimate endpoint for them — `cost`/`--estimate` do NOT cover
+them). Check the balance with `rtst account credits --json` before and after.
+
+Note: **motion transfer** (above — animate a character image using a reference
+video's movement) is a different feature from **video-input video models**
+(generation models that take a source video; their reference-video length is
+priced via `rtst video cost --input-video-duration`). Don't conflate the two.
 
 ## Account
 

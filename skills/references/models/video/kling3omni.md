@@ -26,8 +26,15 @@ rtst video create <name> --prompt "..." [flags] --wait --json
 - **Durations (s):** `3`–`15`
 - **Audio:** yes — enable with `--audio` (native multi-character audio, voice lock)
 - **Image input:** `--first-frame <file>`, `--last-frame <file>`, and
-  `--reference-image <file>` (repeatable) for character/element references. Local
-  files auto-upload.
+  `--reference-image <file>` (repeatable, up to 7) for character/element
+  references. Inputs may be local files, URLs, or existing photo ids; this model
+  takes **photo ids, not URLs**, so the CLI uploads each input as a Photo
+  automatically.
+- **Prompt placeholders (required for references):** mention each reference in
+  the prompt — `{{img1}}`, `{{img2}}`, ... for `--reference-image` order;
+  `{{first}}`/`{{last}}` for the frame flags. E.g. `"the character from {{img1}}
+  wearing the outfit from {{img2}}"`. Unmentioned references anchor nothing.
+  Content-moderated (public figures rejected).
 
 ## How Omni differs from base Kling 3.0
 

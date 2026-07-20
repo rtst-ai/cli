@@ -13,7 +13,8 @@ rtst video create seedance20 --prompt "..." [flags] --wait --json
 - **Resolutions:** `480p`, `720p`, `1080p`, `2160p` (4K)
 - **Durations (s):** `4`–`15` (any integer in range)
 - **Audio:** Yes — enable with `--audio`
-- **Image input:** `--first-frame <file>`, `--last-frame <file>` (frame interpolation), `--reference-image <file>` (repeatable, for subject/style guidance). Local files auto-upload; URLs also accepted.
+- **Image input:** `--first-frame <file>`, `--last-frame <file>` (frame interpolation), `--reference-image <file>` (repeatable, up to 9, for subject/style guidance). Inputs may be local files, URLs, or existing photo ids; this model takes **photo ids, not URLs**, so the CLI uploads each input as a Photo automatically.
+- **Prompt placeholders (required for references):** refer to each reference inside the prompt — `{{img1}}` = first `--reference-image`, `{{img2}}` = second, ...; `{{first}}`/`{{last}}` = the frame flags. E.g. `"the woman from {{img1}} dancing in the courtyard from {{img2}}"`. A reference the prompt never mentions anchors nothing. Reference media are content-moderated (public figures rejected; human photos may need a short processing retry on first use).
 
 ## How to prompt it
 Seedance 2.0 rewards structured, descriptive prompts. Use the BytePlus 6-step formula and aim for roughly 60–100 words:

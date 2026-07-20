@@ -10,6 +10,15 @@ names (or would benefit from) a specific model.
 
 ## Video models
 
+`i2v` = accepts an image input (image-to-video, e.g. `--first-frame`; "first+last"
+means `--last-frame` works too). `audio` = native audio generation.
+
+Structured-reference models (`seedance20`/`fast`/`mini`, `kling3`, `kling3omni`,
+`geminiomniflash`) take image inputs as photo ids and want each reference
+mentioned in the prompt via placeholders (`{{img1}}`, `{{img2}}`, ...,
+`{{first}}`/`{{last}}`) — the CLI handles the upload/rewrite; see each model's
+doc and `rtst model get <name> --json` → `image_capabilities`.
+
 | `rtst` model | Underlying model | i2v | audio | doc |
 |--------------|------------------|-----|-------|-----|
 | `seedance15pro` | ByteDance Seedance 1.5 Pro | ✓ (first+last) | ✓ | [video/seedance15pro.md](./video/seedance15pro.md) |
@@ -19,6 +28,7 @@ names (or would benefit from) a specific model.
 | `kling3` | Kuaishou Kling 3.0 | ✓ (first+last) | ✓ | [video/kling3.md](./video/kling3.md) |
 | `kling3omni` | Kuaishou Kling 3 Omni | ✓ (first+last) | ✓ | [video/kling3omni.md](./video/kling3omni.md) |
 | `kling26` | Kuaishou Kling 2.6 | ✓ (first+last) | ✓ | [video/kling26.md](./video/kling26.md) |
+| `geminiomniflash` | Google Gemini Omni Flash | ✓ (first+last) | ✓ (native, no flag) | [video/geminiomniflash.md](./video/geminiomniflash.md) |
 | `ltx23` | Lightricks LTX-2 Pro | ✓ | ✓ | [video/ltx23.md](./video/ltx23.md) |
 | `veo3` | Google Veo 3 | ✓ | ✓ | [video/veo3.md](./video/veo3.md) |
 | `veo31` | Google Veo 3.1 | ✓ (first frame) | ✓ | [video/veo31.md](./video/veo31.md) |
