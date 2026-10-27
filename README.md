@@ -2,7 +2,7 @@
 
 [![npm version](https://img.shields.io/npm/v/@rtst-ai/cli.svg)](https://www.npmjs.com/package/@rtst-ai/cli)
 [![license: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
-[![node >= 20](https://img.shields.io/badge/node-%3E%3D20-brightgreen.svg)](https://nodejs.org)
+[![node >= 22](https://img.shields.io/badge/node-%3E%3D22-brightgreen.svg)](https://nodejs.org)
 
 The official command-line client for the [rtst](https://rtst.ai) AI image and video generation API.
 
@@ -14,7 +14,7 @@ Pick the method that matches your setup. All of them put an `rtst` command on yo
 
 ### npm (recommended)
 
-Requires Node.js 20 or later.
+Requires Node.js 22 or later.
 
 ```bash
 npm install -g @rtst-ai/cli

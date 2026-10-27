@@ -14,7 +14,8 @@ rtst video create seedance20fast --prompt "..." [flags] --wait --json
 - **Durations (s):** `4`–`15` (any integer in range)
 - **Audio:** Yes — enable with `--audio`
 - **Image input:** `--first-frame <file>`, `--last-frame <file>` (frame interpolation), `--reference-image <file>` (repeatable, up to 9). Inputs may be local files, URLs, or existing photo ids; this model takes **photo ids, not URLs**, so the CLI uploads each input as a Photo automatically.
-- **Prompt placeholders (required for references):** mention each reference in the prompt — `{{img1}}`, `{{img2}}`, ... for `--reference-image` order; `{{first}}`/`{{last}}` for the frame flags. Unmentioned references anchor nothing. Content-moderated (public figures rejected).
+- **Prompt placeholders (required for references):** mention each reference in the prompt — `{{img1}}`, `{{img2}}`, ... for `--reference-image` order; `{{first}}`/`{{last}}` for the frame flags (written as plain words — the frame is already set by the flag). **Use frames OR reference images in one job, not both** (the provider rejects the mix; the CLI stops you first). Unmentioned references anchor nothing. Content-moderated (public figures rejected).
+- **Video & audio references:** `--reference-video <file>` and `--reference-audio <file>` (each repeatable, up to 3; local files, URLs, or existing ids), cited as `{{vid1}}`, `{{aud1}}`, ... E.g. `"the dancer from {{img1}} moves to the beat of {{aud1}}"`. Per-file and total duration limits are in `rtst model get <model> --json` → `image_capabilities.reference_videos` / `reference_audios` (defaults: 2 to 15 s each, 15 s total). Reference audio turns on `--audio` automatically. Like images, these cannot be combined with `--first-frame`/`--last-frame`.
 
 ## How to prompt it
 Prompt it exactly like the flagship `seedance20` — it shares the same architecture and prompt understanding. Use the 6-step formula, ~60–100 words:

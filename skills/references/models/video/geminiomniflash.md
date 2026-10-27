@@ -21,7 +21,7 @@ rtst video create geminiomniflash --reference-video ./clip.mp4 \
 - **Audio:** generated natively by the model (music/SFX; steer it from the prompt); there is no `--audio` flag for this model
 - **Image input:** `--first-frame`, `--last-frame`, `--reference-image` (repeatable, up to 7). This is a structured-reference model: inputs are **photo ids, not URLs** — the CLI uploads local files/URLs as Photos automatically.
 - **Video input:** one `--reference-video` (local file, URL, or video-media id) — the source footage to edit. Max 1 video.
-- **Prompt placeholders (required for references):** `{{img1}}`, `{{img2}}`, ... for reference images ({{first}}/{{last}} for frames) and `{{vid1}}` for the source video. Unmentioned references anchor nothing.
+- **Prompt placeholders (required for references):** `{{img1}}`, `{{img2}}`, ... for reference images ({{first}}/{{last}} for frames, written as plain words) and `{{vid1}}` for the source video. Unmentioned references anchor nothing.
 
 ## How to prompt it
 

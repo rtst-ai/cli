@@ -13,31 +13,39 @@ names (or would benefit from) a specific model.
 `i2v` = accepts an image input (image-to-video, e.g. `--first-frame`; "first+last"
 means `--last-frame` works too). `audio` = native audio generation.
 
-Structured-reference models (`seedance20`/`fast`/`mini`, `kling3`, `kling3omni`,
-`geminiomniflash`) take image inputs as photo ids and want each reference
-mentioned in the prompt via placeholders (`{{img1}}`, `{{img2}}`, ...,
-`{{first}}`/`{{last}}`) — the CLI handles the upload/rewrite; see each model's
+Structured-reference models (`seedance20`/`fast`/`mini`, `seedance205`, `wan30`,
+`minimaxh3`, `kling3`, `kling3omni`, `geminiomniflash`) take inputs as uploaded
+ids and want each reference mentioned in the prompt via placeholders
+(`{{img1}}`, `{{vid1}}`, `{{aud1}}`, ..., `{{first}}`/`{{last}}`); the CLI
+handles the upload/rewrite. Seedance 2.x and Wan 3.0 take frames OR references
+per job, not both. `ref` below = reference media beyond images (`v` video,
+`a` audio). `omnihuman20` is a talking avatar: one portrait plus one speech clip. See each model's
 doc and `rtst model get <name> --json` → `image_capabilities`.
 
-| `rtst` model | Underlying model | i2v | audio | doc |
-|--------------|------------------|-----|-------|-----|
-| `seedance15pro` | ByteDance Seedance 1.5 Pro | ✓ (first+last) | ✓ | [video/seedance15pro.md](./video/seedance15pro.md) |
-| `seedance20` | ByteDance Seedance 2.0 | ✓ (first+last) | ✓ | [video/seedance20.md](./video/seedance20.md) |
-| `seedance20fast` | ByteDance Seedance 2.0 Fast | ✓ | ✓ | [video/seedance20fast.md](./video/seedance20fast.md) |
-| `seedance20mini` | ByteDance Seedance 2.0 Mini | ✓ | ✓ | [video/seedance20mini.md](./video/seedance20mini.md) |
-| `kling3` | Kuaishou Kling 3.0 | ✓ (first+last) | ✓ | [video/kling3.md](./video/kling3.md) |
-| `kling3omni` | Kuaishou Kling 3 Omni | ✓ (first+last) | ✓ | [video/kling3omni.md](./video/kling3omni.md) |
-| `kling26` | Kuaishou Kling 2.6 | ✓ (first+last) | ✓ | [video/kling26.md](./video/kling26.md) |
-| `geminiomniflash` | Google Gemini Omni Flash | ✓ (first+last) | ✓ (native, no flag) | [video/geminiomniflash.md](./video/geminiomniflash.md) |
-| `ltx23` | Lightricks LTX-2 Pro | ✓ | ✓ | [video/ltx23.md](./video/ltx23.md) |
-| `veo3` | Google Veo 3 | ✓ | ✓ | [video/veo3.md](./video/veo3.md) |
-| `veo31` | Google Veo 3.1 | ✓ (first frame) | ✓ | [video/veo31.md](./video/veo31.md) |
-| `hailuo23` | MiniMax Hailuo 2.3 | ✓ | ✓ | [video/hailuo23.md](./video/hailuo23.md) |
-| `vidu` | Vidu Q2 | ✓ (first+last) | ✓ | [video/vidu.md](./video/vidu.md) |
-| `wan22` | Alibaba Wan 2.2 | ✓ | ✗ | [video/wan22.md](./video/wan22.md) |
-| `wan25` | Alibaba Wan 2.5 | ✓ | ✓ | [video/wan25.md](./video/wan25.md) |
-| `wan26` | Alibaba Wan 2.6 | ✓ | ✓ | [video/wan26.md](./video/wan26.md) |
-| `wan26flash` | Alibaba Wan 2.6 Flash | ✗ | ✓ | [video/wan26flash.md](./video/wan26flash.md) |
+| `rtst` model | Underlying model | i2v | audio | ref | doc |
+|--------------|------------------|-----|-------|-----|-----|
+| `seedance205` | ByteDance Seedance 2.5 | ✓ (first+last) | ✓ | v, a | [video/seedance205.md](./video/seedance205.md) |
+| `wan30` | Alibaba Wan 3.0 | ✓ (first+last) | ✓ | v, a | [video/wan30.md](./video/wan30.md) |
+| `minimaxh3` | MiniMax H3 | ✓ (first+last) | ✓ (always on) | v, a | [video/minimaxh3.md](./video/minimaxh3.md) |
+| `omnihuman20` | ByteDance OmniHuman 2.0 | portrait | from your audio | a (required) | [video/omnihuman20.md](./video/omnihuman20.md) |
+| `ltx25pro` | Lightricks LTX 2.5 Pro | ✓ (first frame) | ✓ | | [video/ltx25pro.md](./video/ltx25pro.md) |
+| `seedance15pro` | ByteDance Seedance 1.5 Pro | ✓ (first+last) | ✓ |  | [video/seedance15pro.md](./video/seedance15pro.md) |
+| `seedance20` | ByteDance Seedance 2.0 | ✓ (first+last) | ✓ | v, a | [video/seedance20.md](./video/seedance20.md) |
+| `seedance20fast` | ByteDance Seedance 2.0 Fast | ✓ | ✓ | v, a | [video/seedance20fast.md](./video/seedance20fast.md) |
+| `seedance20mini` | ByteDance Seedance 2.0 Mini | ✓ | ✓ | v, a | [video/seedance20mini.md](./video/seedance20mini.md) |
+| `kling3` | Kuaishou Kling 3.0 | ✓ (first+last) | ✓ |  | [video/kling3.md](./video/kling3.md) |
+| `kling3omni` | Kuaishou Kling 3 Omni | ✓ (first+last) | ✓ |  | [video/kling3omni.md](./video/kling3omni.md) |
+| `kling26` | Kuaishou Kling 2.6 | ✓ (first+last) | ✓ |  | [video/kling26.md](./video/kling26.md) |
+| `geminiomniflash` | Google Gemini Omni Flash | ✓ (first+last) | ✓ (native, no flag) | v (edit) | [video/geminiomniflash.md](./video/geminiomniflash.md) |
+| `ltx23` | Lightricks LTX-2 Pro | ✓ | ✓ |  | [video/ltx23.md](./video/ltx23.md) |
+| `veo3` | Google Veo 3 | ✓ | ✓ |  | [video/veo3.md](./video/veo3.md) |
+| `veo31` | Google Veo 3.1 | ✓ (first frame) | ✓ |  | [video/veo31.md](./video/veo31.md) |
+| `hailuo23` | MiniMax Hailuo 2.3 | ✓ | ✓ |  | [video/hailuo23.md](./video/hailuo23.md) |
+| `vidu` | Vidu Q2 | ✓ (first+last) | ✓ |  | [video/vidu.md](./video/vidu.md) |
+| `wan22` | Alibaba Wan 2.2 | ✓ | ✗ |  | [video/wan22.md](./video/wan22.md) |
+| `wan25` | Alibaba Wan 2.5 | ✓ | ✓ |  | [video/wan25.md](./video/wan25.md) |
+| `wan26` | Alibaba Wan 2.6 | ✓ | ✓ |  | [video/wan26.md](./video/wan26.md) |
+| `wan26flash` | Alibaba Wan 2.6 Flash | ✗ | ✓ |  | [video/wan26flash.md](./video/wan26flash.md) |
 
 ## Image models
 

@@ -8,11 +8,16 @@ description: |
   "edit / restyle / remix this image", "remove the background",
   "cut out the background", "upscale / enhance this image",
   "make this higher resolution", "generate a face / portrait variation",
-  "remove the watermark from this video", or "transfer motion onto this photo".
+  "remove the watermark from this video", "transfer motion onto this photo",
+  "make this photo talk", "lip-sync this person to my audio", "talking avatar",
+  "set this to my song / voiceover", "keep this character consistent",
+  "use this clip as a reference", or "edit / remove something from this video".
   Supports text-to-image, image-to-image editing, text-to-video,
-  image-to-video (first/last frame + reference images), background removal,
-  image enhancement/upscaling, face generation, watermark removal, and
-  motion transfer. Discovers available models and their parameters live.
+  image-to-video (first/last frame), reference-driven video (reference images,
+  videos and audio cited in the prompt), talking avatars from a photo + speech,
+  video editing, background removal, image enhancement/upscaling, face
+  generation, watermark removal, and motion transfer. Discovers available
+  models and their parameters live.
   NOT for: account/billing questions (that is just `rtst account`), or
   stitching multiple clips together (use rtst-video-stitch).
 argument-hint: "[what to generate] [--model <name>] [--image <path-or-url>]"
@@ -50,8 +55,11 @@ choose a command, run it, wait for the result, and report the output URL/file.
 3. Always pass `--json` to commands you parse; extract fields with `jq`.
 4. Pick a sensible default model and proceed. Only ask the user when a required
    input is genuinely missing (e.g. no prompt for a text-to-image request).
-5. Prefer quality defaults; do not optimize for cheaper models unless asked. You
-   may run `... cost ...` silently to avoid surprises, but do not lecture about price.
+5. Prefer quality defaults; do not optimize for cheaper models unless asked.
+   Video spends real credits: preview with `--estimate --json` on the exact
+   create command (same flags) and mention the cost in one line before
+   submitting anything long or expensive. With `--reference-video` attached
+   the estimate is a floor (the input video is billed too). Do not lecture about price.
 6. Reply in the user's language; keep CLI flags in English.
 
 ## Choosing a command
@@ -62,6 +70,10 @@ choose a command, run it, wait for the result, and report the output URL/file.
 | Edit / restyle an image | `rtst image create <model> --prompt "..." --image <path> --wait --json` |
 | Text → video | `rtst video create <model> --prompt "..." --wait --json` |
 | Animate a photo (image → video) | `rtst video create <model> --prompt "..." --first-frame <path> --wait --json` |
+| Consistent character / product across shots | `rtst video create seedance20 --reference-image <img> --prompt "the woman from {{img1}} ..." --wait --json` |
+| Video set to a song / voice (reference audio) | `rtst video create seedance20 --reference-image <img> --reference-audio <mp3> --prompt "{{img1}} sings along to {{aud1}} ..." --wait --json` |
+| Talking avatar (photo + speech → lip-synced video) | `rtst video create omnihuman20 --reference-image <portrait> --reference-audio <speech.mp3> --prompt "..." --wait --json` |
+| Edit an existing video (remove / replace / restyle) | `rtst video create geminiomniflash --reference-video <clip> --prompt "In {{vid1}}, <one change>. Keep everything else the same." --wait --json` |
 | Remove background | `rtst edit removebg <path> --wait --json` |
 | Upscale / enhance | `rtst edit enhance <path> --scale 4 --wait --json` |
 | Face variation | `rtst edit facegen <path> --wait --json` |
@@ -69,7 +81,16 @@ choose a command, run it, wait for the result, and report the output URL/file.
 | Motion transfer | `rtst edit motion-transfer --model <m> --character <img> --reference-video <url> --wait --json` |
 
 Local file paths for `--image` / `--first-frame` / `--last-frame` /
-`--reference-image` are **auto-uploaded** — pass them directly. URLs also work.
+`--reference-image` / `--reference-video` / `--reference-audio` are
+**auto-uploaded**: pass them directly. URLs also work.
+
+**References are cited in the prompt.** On structured-reference models
+(Seedance 2.x, Wan 3.0, MiniMax H3, Kling 3, Gemini Omni Flash) write
+`{{img1}}`, `{{vid1}}`, `{{aud1}}`, ... (flag order) where each input belongs in
+the prompt, and say what it contributes; a reference the prompt never mentions
+anchors nothing. Seedance 2.x and Wan 3.0 take frames OR references in one job,
+not both. On other models, describe inputs in plain words (placeholders are
+refused). Run `rtst guide` for the full rules.
 
 **Model-specific params:** anything a model supports without a dedicated flag
 goes through repeatable `--param key=value` (value may be JSON). Notably, Wan 2.7
@@ -91,6 +112,10 @@ rtst model get <name> --json         # full params for one model
 Sensible defaults (verify with `model list` if a call fails):
 - **Image:** a Seedream / Nano-Banana class model for quality.
 - **Video:** a Seedance class model; use image-to-video when the user gives a photo.
+- **Video from reference images / clips / audio:** `seedance20` (or `seedance205`
+  for longer clips and more references, `wan30` for up to 30 s with audio).
+- **Talking avatar / lip-sync a photo to speech:** `omnihuman20` (length follows the audio).
+- **Editing existing footage:** `geminiomniflash`.
 
 **Model-specific prompting.** Once you've chosen (or the user named) a model, read
 its reference doc for how to prompt it well, its exact params, example prompts,

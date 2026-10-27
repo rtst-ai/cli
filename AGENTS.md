@@ -79,11 +79,12 @@ One-shot blocking form: add `--wait` to `create`.
 **Image-to-video:** `--first-frame ./start.png` (also `--last-frame`,
 `--reference-image` repeatable). Local files auto-upload; URLs pass through.
 
-### Reference images & prompt placeholders (Seedance 2 / Kling 3 / Gemini Omni Flash)
+### Reference images & prompt placeholders (Seedance 2.x / Wan 3.0 / MiniMax H3 / Kling 3 / Gemini Omni Flash)
 
 Structured-reference models (`seedance20`, `seedance20fast`, `seedance20mini`,
-`kling3`, `kling3omni`, `geminiomniflash`) treat reference images as **named
-actors you direct from the prompt**, not as passive style hints. Check support
+`seedance205`, `wan30`, `minimaxh3`, `kling3`, `kling3omni`, `geminiomniflash`)
+treat reference images, videos and audio as **named actors you direct from the
+prompt**, not as passive style hints. Check support
 and limits at runtime: `rtst model get <name> --json` →
 `image_capabilities.reference_images` (`supported`, `max`) and
 `reference_input_type: "id"` marks a placeholder model.
@@ -110,11 +111,11 @@ camera tracking her from behind, rain, cinematic atmosphere, slow dolly" \
   mentions gives the model nothing to anchor: say what each image contributes
   (person, product, style, background).
 - Reference media are content-moderated: photos of public figures are
-  rejected, and human photos can take a moment of extra processing on first
-  use (retry shortly if told a photo is still processing).
-- On all **other** video models, `--reference-image` is unsupported (see
-  `image_capabilities`) and image inputs are plain URLs — placeholders have no
-  meaning there.
+  rejected; on Seedance 2, photos of people get an extra moderation pass on
+  first use (~10 s), and the CLI waits for it before submitting.
+- On all **other** video models image inputs are plain URLs and placeholders
+  are refused (the model would render them as text); `--reference-image` is
+  unsupported there except on `omnihuman20` (below).
 
 **Video editing (`geminiomniflash`):** pass source footage with
 `--reference-video <file|url|id>` and address it in the prompt as `{{vid1}}` —
@@ -129,6 +130,46 @@ rtst video create geminiomniflash --reference-video ./clip.mp4 \
 
 Keep edit instructions short and surgical (one change + "Keep everything else
 the same"); see `skills/references/models/video/geminiomniflash.md`.
+
+**Reference video and audio (Seedance 2.x, Wan 3.0, MiniMax H3):** pass
+`--reference-video <file|url|id>` and/or `--reference-audio <file|url|id>`
+(both repeatable) and cite them in the prompt as `{{vid1}}`, `{{vid2}}`, ...
+and `{{aud1}}`, `{{aud2}}`, ... Check limits with `rtst model get <name> --json`
+→ `image_capabilities.reference_videos` / `reference_audios` (max count,
+per-file and total duration). Audio is uploaded as-is (mp3/wav; other formats
+are converted server-side) and is not moderated, so there is no wait.
+Reference audio turns on `--audio` automatically. MiniMax H3 needs an image or
+video alongside audio; Seedance 2 and Wan 3.0 refuse frames combined with any
+reference media.
+
+```bash
+rtst video create seedance20 \
+  --reference-image ./singer.png --reference-audio ./song.mp3 \
+  --prompt "The woman from {{img1}} sings along to {{aud1}} on a dim stage, slow push-in, warm spotlight" \
+  --duration 10 --wait --json
+```
+
+A bare number reuses an existing upload (audio-media or video-media id), and
+raw `{{a-123}}` / `{{v-123}}` tags pass through untouched.
+
+### Talking avatar (`omnihuman20`)
+
+One portrait plus one speech clip: the person speaks the audio with lip sync,
+head motion and expression. Pass exactly one `--reference-image` and one
+`--reference-audio` (file or URL, mp3/wav, 4 to 300 s). The video is as long as
+the audio and billed per second of it, so there is no `--duration`; the prompt
+is optional (it directs scene, gestures and camera) and uses plain words, no
+placeholders. Output is 720p and the shape follows the image.
+
+```bash
+rtst video create omnihuman20 --reference-audio ./speech.mp3 --estimate --json   # measures the audio
+rtst video create omnihuman20 \
+  --reference-image ./portrait.png --reference-audio ./speech.mp3 \
+  --prompt "speaks warmly to the camera with small hand gestures, slow push-in" --wait --json
+```
+
+Use a clear, front-facing, well-lit photo of one person; clean speech without
+music works best.
 
 ## Image lifecycle
 
